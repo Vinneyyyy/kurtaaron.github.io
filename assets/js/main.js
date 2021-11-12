@@ -1,312 +1,157 @@
-/**
-*	mCard (HTML)
-*	Copyright © mCard by beshleyua. All Rights Reserved.
-**/
+(function($){
+    "use strict";
 
-$(function () {
-	'use strict';
-	
-	var width = $(window).width();
-	var height = $(window).height();
-	
-	/* Preloader */
-	$(window).on('load', function() {
-		$(".preloader .spinner").fadeOut(function(){
-			$('.preloader').fadeOut();
-			$('body').addClass('ready');
-		});
-	});
+    //VARIABLES USED
+    var $body = $('body'),
+      $siteNavbar = $('.site-navbar'),
+      siteNavbar_base = $siteNavbar.attr('data-navbar-base') ? $siteNavbar.attr('data-navbar-base') : '',
+      siteNavbar_toggled = $siteNavbar.attr('data-navbar-toggled') ? $siteNavbar.attr('data-navbar-toggled') : '',
+      siteNavbar_scrolled = $siteNavbar.attr('data-navbar-scrolled') ? $siteNavbar.attr('data-navbar-scrolled') : '';
 
-	/* Fade animations on scroll */
-	if (width > 720) {
-		window.sr = ScrollReveal();
-		sr.reveal('.animated');
-	}
+    // LOADER
+    window.addEventListener( 'load', function(){
+      document.querySelector('body').classList.add('loaded');
+    });
 
-	/* Youtube video background */
-	var myPlayer = $("#video-bg").YTPlayer();
+    // NAVIGATION
+  
+    function navOnScroll(){
+      if ( $siteNavbar.length > 0 ){
+        var currentPos = $(window).scrollTop();
+  
+        if ( currentPos > 0 ){
+          if ( $siteNavbar.hasClass('scrolled') ){
+            return;
+          }
+  
+          $siteNavbar.addClass('scrolled').removeClass('scrolled-0');
+  
+          if( $siteNavbar.hasClass('navbar-toggled-show') ){
+            navChangeClasses('toggled');
+          } else {
+            navChangeClasses('scrolled');
+          }
+        } else {
+          $siteNavbar.removeClass('scrolled').addClass('scrolled-0');
+  
+          if( $siteNavbar.hasClass('navbar-toggled-show') ){
+            navChangeClasses('toggled');
+          } else if( $body.hasClass('flyer-open') ){
+            navChangeClasses('flyer');
+          } else {
+            navChangeClasses();
+          }
+        }
+      }
+    }
 
-	/* Smoothscroll */
-	if($('#home-section').length) {
-		$(window).on('scroll', function(){
-			var scrollPos = $(window).scrollTop();
-			$('.top-menu ul li a').each(function () {
-				var currLink = $(this);
-				var refElement = $(currLink.attr("href"));
-				if (refElement.offset().top - 30 <= scrollPos) {
-					$('.top-menu ul li').removeClass("active");
-					currLink.closest('li').addClass("active");
-				}
-			});
-		});
-	}
+    var nav_event_old;
+    function navChangeClasses(nav_event){
+      if( nav_event_old === nav_event && !( nav_event == '' || nav_event == undefined ) )
+        return;
+  
+      if( nav_event === 'toggled' && siteNavbar_toggled ){
+        $siteNavbar.removeClass('navbar-light navbar-dark', siteNavbar_base, siteNavbar_scrolled);
+        $siteNavbar.addClass(siteNavbar_toggled);
+      } else if( nav_event === 'scrolled' && siteNavbar_scrolled ){
+        $siteNavbar.removeClass('navbar-light navbar-dark', siteNavbar_base, siteNavbar_toggled);
+        $siteNavbar.addClass(siteNavbar_scrolled);
+      } else {
+        if(siteNavbar_base){
+          $siteNavbar.removeClass('navbar-light navbar-dark', siteNavbar_toggled, siteNavbar_scrolled);
+          $siteNavbar.addClass(siteNavbar_base);
+        }
+      }
+  
+      if( $siteNavbar.hasClass('navbar-light') ){
+        $('[data-on-navbar-light]').each(function(){
+          var el = $(this);
+  
+          if( el.attr('data-on-navbar-dark') ){
+            el.removeClass(el.attr('data-on-navbar-dark'));
+          }
+          if( el.attr('data-on-navbar-light') ){
+            el.addClass(el.attr('data-on-navbar-light'));
+          }
+        });
+      } else if( $siteNavbar.hasClass('navbar-dark') ){
+        $('[data-on-navbar-dark]').each(function(){
+          var el = $(this);
+  
+          if( el.attr('data-on-navbar-light') ){
+            el.removeClass(el.attr('data-on-navbar-light'));
+          }
+          if( el.attr('data-on-navbar-dark') ){
+            el.addClass(el.attr('data-on-navbar-dark'));
+          }
+        });
+      }
+  
+      nav_event_old = nav_event;
+    }
+  
+    // BACKGROUND
+    function background(){  
+      // IMAGE
+      var $bgImage = $('.bg-image-holder');
+      if($bgImage.length){
+        $bgImage.each(function(){
+          var $self = $(this);
+          var src = $self.children('img').attr('src');
+          $self.css('background-image','url('+src+')').children('img').hide();
+        });
+      }
+    }
 
-	/* Top Menu */
-	if($('#home-section').length) {
-		$('.top-menu ul li a').on('click', function(){
-			var id = $(this).attr('href');
-			var h = parseFloat($(id).offset().top);
-			
-			$('body,html').animate({
-				scrollTop: h
-			}, 800);
-			
-			return false;
-		});
-		$('.section').on('click', '.contact-btn', function(){
-			$('.top-menu li a[href="#contact-section"]').click();
-			
-			return false;
-		});
-	}
+    // TYPED TEXT
+    function typedText(){
+      var toggle = document.querySelectorAll('[data-toggle="typed"]');
+      function init(el) {
+        var elementOptions = el.dataset.options;
+            elementOptions = elementOptions ? JSON.parse(elementOptions) : {};
+        var defaultOptions = {
+          typeSpeed: 40,
+          backSpeed: 40,
+          backDelay: 3000,
+          loop: true
+        }
+        var options = Object.assign(defaultOptions, elementOptions);
+        new Typed(el, options);
+      }
+      if (typeof Typed !== 'undefined' && toggle) {
+        [].forEach.call(toggle, function(el) {
+          init(el);
+        });
+      }
+    }
+    
+    $(document).ready(function(){
+        navOnScroll();
+        background();
+        typedText();
+    });
 
-	/* Open Top Menu */
-	$('.page').on('click', '.menu-btn', function(){
-		if($('.top-menu').hasClass('active')){
-			$('.top-menu').removeClass('active');
-		} else {
-			$('.top-menu').addClass('active');
-		}
+    $(window).on('scroll', function(){
+        navOnScroll()
+    })
 
-		return false;
-	});
+    $(window).on('resize', function(){
+        navOnScroll();
+      });
+    
+})(jQuery);
 
-	/* Fixed Top Menu on scroll */
-	$(window).on('scroll', function(){
-		if ($(this).scrollTop() > 100) {
-			$('.top-menu').addClass('fixed');
-		} 
-		else {
-			$('.top-menu').removeClass('fixed');
-		}
-	});
+//PARTICLES JS 
 
-	/* Clients carousel */
-	$(".reviews-carousel .owl-carousel").owlCarousel({
-		items: 1,
-		margin: 0,
-		nav: false,
-		dots: true,
-		loop: false,
-		smartSpeed: 600,
-		mouseDrag: true,
-		touchDrag: true,
-		autoplay: false
-	});
+window.onload = function() { 
+    Particles. init ({ 
+      selector: '.Particles' 
+    }); 
+  };
 
-	/* Button hover effect */
-	$('.btn_animated').on('mouseenter', '.circle', function(e){
-		if ($(this).find(".ink").length === 0) {
-			$(this).prepend("<span class='ink'></span>");
-		}
-		var ink = $(this).find(".ink");
-		ink.removeClass("animate");
-		if (!ink.height() && !ink.width()) {
-			var d = Math.max($(this).outerWidth(), $(this).outerHeight());
-			ink.css({
-				height: d,
-				width: d
-			});
-		}
-		var x = e.pageX - $(this).offset().left - ink.width() / 2;
-		var y = e.pageY - $(this).offset().top - ink.height() / 2;
-		ink.css({
-			top: y + 'px',
-			left: x + 'px'
-		}).addClass("animate");
-	});
-	
-	/* Validate contact form */
-	$("#cform").validate({
-		rules: {
-			name: {
-				required: true
-			},
-			message: {
-				required: true
-			},
-			subject: {
-				required: true
-			},
-			email: {
-				required: true,
-				email: true
-			}
-		},
-		success: "valid",
-		submitHandler: function() {
-			$.ajax({
-				url: 'mailer/feedback.php',
-				type: 'post',
-				dataType: 'json',
-				data: 'name='+ $("#cform").find('input[name="name"]').val() + '&email='+ $("#cform").find('input[name="email"]').val() + '&subject='+ $("#cform").find('input[name="subject"]').val() + '&message=' + $("#cform").find('textarea[name="message"]').val(),
-				beforeSend: function() {
-				
-				},
-				complete: function() {
-				
-				},
-				success: function(data) {
-					$('#cform').fadeOut();
-					$('.alert-success').delay(1000).fadeIn();
-				}
-			});
-		}
-	});
-
-	/* Validate contact form */
-	$("#blog-form").validate({
-		rules: {
-			name: {
-				required: true
-			},
-			message: {
-				required: true
-			},
-			email: {
-				required: true,
-				email: true
-			}
-		},
-		success: "valid",
-		submitHandler: function() {
-			$('#blog-form').fadeOut();
-			$('.alert-success').delay(1000).fadeIn();
-		}
-	});
-	
-	/* Initialize masonry items */
-	var $container = $('.box-items');
-	
-	$container.imagesLoaded(function(){
-		$container.multipleFilterMasonry({
-			itemSelector: '.box-item',
-			filtersGroupSelector: '.filters',
-			percentPosition: true,
-			gutter: 0
-		});
-	});
-	
-	/* 12. Initialize masonry filter */
-	$('.filters label').on('change', 'input[type="radio"]', function() {
-		if ($(this).is(':checked')) {
-			$('.f_btn').removeClass('active');
-			$(this).closest('.f_btn').addClass('active');
-		}
-		/* Refresh Portfolio magnific popup */
-		$('.has-popup').magnificPopup({
-			type: 'inline',
-			overflowY: 'auto',
-			closeBtnInside: true,
-			mainClass: 'mfp-fade'
-		});
-	});
-	
-	/* Portfolio magnific popup */
-	$('.has-popup').magnificPopup({
-		type: 'inline',
-		overflowY: 'auto',
-		closeBtnInside: true,
-		mainClass: 'mfp-fade'
-	});
-	
-	/* gallery */
-	$('.post-lightbox').magnificPopup({
-		delegate: 'a',
-		type: 'image',
-		tLoading: 'Loading image #%curr%...',
-		mainClass: 'mfp-img-mobile',
-		gallery: {
-			enabled: true,
-			navigateByImgClick: true,
-			preload: [0,1] // Will preload 0 - before current, and 1 after the current image
-		},
-		image: {
-			tError: '<a href="%url%">The image #%curr%</a> could not be loaded.'
-		}
-	});
-
-	if($('#home-section').length) {
-		google.maps.event.addDomListener(window, 'load', initMap);
-	}
-
-});
-
-/* Google Map Options */
-function initMap() {
-	var myLatlng = new google.maps.LatLng(40.773328,-73.960088); // <- Your latitude and longitude
-	var styles = [
-	{
-		"featureType": "water",
-		"stylers": [{
-			"color": "#d8dee9"
-		},
-		{
-			"visibility": "on"
-		}]
-	},
-	{
-		"featureType": "landscape",
-		"stylers": [{
-			"color": "#eeeeee"
-		}]
-	},
-	{
-		"featureType": "road",
-		"stylers": [{
-			"saturation": -100
-		},
-		{
-			"lightness": 45
-		}]
-	},
-	{
-		"featureType": "road.highway",
-		"stylers": [{
-			"visibility": "simplified"
-		}]
-	},
-	{
-		"featureType": "road.arterial",
-		"elementType": "labels.icon",
-		"stylers": [{
-			"visibility": "on"
-		}]
-	},
-	{
-		"featureType": "administrative",
-		"elementType": "labels.text.fill",
-		"stylers": [{
-			"color": "#363636"
-		}]
-	},
-	{
-		"featureType": "transit",
-		"stylers": [{
-			"visibility": "off"
-		}]
-	},
-	{
-		"featureType": "poi",
-		"stylers": [{
-			"visibility": "off"
-		}]
-	}]
-
-	var mapOptions = {
-		zoom: 14,
-		center: myLatlng,
-		mapTypeControl: false,
-		disableDefaultUI: true,
-		zoomControl: true,
-		scrollwheel: false,
-		styles: styles
-	}
-	
-	var map = new google.maps.Map(document.getElementById('map'), mapOptions);
-	var marker = new google.maps.Marker({
-		position: myLatlng,
-		map: map,
-		title: 'We are here!'
-	});
-}
+  var particles = Particles.init({
+    selector: '.background',
+    color: ['#DA0463', '#404B69', '#DBEDF3'],
+    connectParticles: true,
+    maxParticles: 100
+    });

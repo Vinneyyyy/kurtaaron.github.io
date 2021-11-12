@@ -1,0 +1,52 @@
+/* Background color */
+
+.bg-gray-800 {
+  background-color: #252734 !important;
+}
+
+.bg-gray-900 {
+  background-color: #1d1e29 !important;
+}
+
+
+/* Background size */
+.bg-cover {
+  background-size: cover;
+}
+
+.bg-contain {
+  background-size: contain;
+}
+
+.bg-cover {
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+
+/* Shadows */
+.shadow-dark-lg {box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.12) !important}
+
+
+/* Position spaces */
+.top-0 {top: 0 !important}
+.top-auto {top: auto !important}
+.bottom-0 {bottom: 0 !important}
+.bottom-auto {bottom: auto !important}
+.left-0 {left: 0}
+.left-auto {left: auto !important}
+.right-0 {right: 0 !important}
+
+
+/* Opacity */
+.opacity-50 {opacity: 0.5}
+
+/* Text colors */
+.text-gray-400 {
+  color: #b2c0d0 !important;
+}
+
+a.text-gray-400:hover, a.text-gray-400:focus {
+  color: #8299b3 !important;
+}
+
